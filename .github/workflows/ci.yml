@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build
+        run: dotnet build src -c Release --nologo
+
+      - name: Test module import
+        shell: pwsh
+        run: |
+          $moduleDir = "src/bin/Release/netstandard2.0"
+
+          # Copy manifest/script alongside DLL for a quick smoke test
+          $tmpDir = "$env:TEMP/PSFileIcons-test"
+          New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
+          Copy-Item "$moduleDir/PSFileIcons.dll"          $tmpDir
+          Copy-Item "src/PSFileIcons.psm1"                $tmpDir
+          Copy-Item "src/PSFileIcons.psd1"                $tmpDir
+          Copy-Item "src/PSFileIcons.format.ps1xml"       $tmpDir
+
+          Import-Module "$tmpDir/PSFileIcons.psd1" -Force
+          Write-Host "Module imported successfully."
+
+          # Smoke test: icon lookup should not return empty
+          $icon = [PSFileIcons.IconMap]::GetFileIcon("test.go", ".go")
+          if (-not $icon) { throw "GetFileIcon returned empty for .go" }
+          Write-Host "Icon for .go: $icon"
+
+          $dirIcon = [PSFileIcons.IconMap]::GetDirIcon(".git")
+          if (-not $dirIcon) { throw "GetDirIcon returned empty for .git" }
+          Write-Host "Icon for .git: $dirIcon"
+
+          Write-Host "All smoke tests passed."

@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build
+        run: dotnet build src -c Release --nologo -v q
+
+      - name: Package module
+        shell: pwsh
+        run: |
+          $version = '${{ github.ref_name }}'.TrimStart('v')
+          $outDir = "dist/PSFileIcons"
+          New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+
+          Copy-Item "src/bin/Release/netstandard2.0/PSFileIcons.dll" $outDir
+          Copy-Item "src/PSFileIcons.psm1"          $outDir
+          Copy-Item "src/PSFileIcons.psd1"          $outDir
+          Copy-Item "src/PSFileIcons.format.ps1xml" $outDir
+
+          # Stamp the version into the manifest
+          $psd1 = Get-Content "$outDir/PSFileIcons.psd1" -Raw
+          $psd1 = $psd1 -replace "ModuleVersion\s*=\s*'[^']*'", "ModuleVersion = '$version'"
+          Set-Content "$outDir/PSFileIcons.psd1" $psd1
+
+          Compress-Archive -Path "$outDir/*" -DestinationPath "dist/PSFileIcons-$version.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/PSFileIcons-*.zip
+          generate_release_notes: true
+
+      - name: Publish to PSGallery
+        shell: pwsh
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          $version = '${{ github.ref_name }}'.TrimStart('v')
+          $moduleDir = "dist/PSFileIcons"
+
+          # Stamp the version into the manifest (already done above, re-read to confirm)
+          $manifest = Test-ModuleManifest "$moduleDir/PSFileIcons.psd1"
+          Write-Host "Publishing PSFileIcons $($manifest.Version) to PSGallery..."
+
+          Publish-Module -Path $moduleDir -NuGetApiKey $env:PSGALLERY_API_KEY -Verbose
+          Write-Host "Published successfully."

@@ -9,10 +9,10 @@ namespace PSFileIcons
     /// </summary>
     public static class IconMap
     {
-        // Default icons
-        public const string DefaultFile = "\uf15b";       //
-        public const string DefaultDir  = "\uf74a";       //
-        public const string DefaultExe  = "\uf013";       //
+        // Default icons — use universally-present Font Awesome glyphs (U+F000 range)
+        public const string DefaultFile = "\uf15b";       //  nf-fa-file
+        public const string DefaultDir  = "\uf07b";       //  nf-fa-folder
+        public const string DefaultExe  = "\uf013";       //  nf-fa-cog
 
         private static readonly Dictionary<string, string> ByExtension =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -134,16 +134,16 @@ namespace PSFileIcons
             { ".avi",    "\uf03d" }, //
             { ".mov",    "\uf03d" }, //
 
-            // Archives
-            { ".zip",    "\uf410" }, //
-            { ".tar",    "\uf410" }, //
-            { ".gz",     "\uf410" }, //
-            { ".bz2",    "\uf410" }, //
-            { ".xz",     "\uf410" }, //
-            { ".7z",     "\uf410" }, //
-            { ".rar",    "\uf410" }, //
-            { ".zstd",   "\uf410" }, //
-            { ".zst",    "\uf410" }, //
+            // Archives — nf-fa-file_archive_o (U+F1C6, Font Awesome, universal)
+            { ".zip",    "\uf1c6" }, //
+            { ".tar",    "\uf1c6" }, //
+            { ".gz",     "\uf1c6" }, //
+            { ".bz2",    "\uf1c6" }, //
+            { ".xz",     "\uf1c6" }, //
+            { ".7z",     "\uf1c6" }, //
+            { ".rar",    "\uf1c6" }, //
+            { ".zstd",   "\uf1c6" }, //
+            { ".zst",    "\uf1c6" }, //
 
             // Executables / binaries
             { ".exe",    "\uf013" }, //

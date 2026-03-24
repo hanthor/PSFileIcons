@@ -1,5 +1,5 @@
 @{
-    ModuleVersion     = '0.1.0'
+    ModuleVersion     = '0.1.1'
     GUID              = '4a7b2c8d-3f1e-4a9b-8c7d-2e5f6a3b4c8d'
     Author            = 'James Reilly'
     CompanyName       = ''
@@ -27,7 +27,7 @@
             Tags         = @('Icons', 'NerdFonts', 'FileSystem', 'Terminal', 'Colors', 'Files', 'Prompt')
             LicenseUri   = 'https://github.com/hanthor/PSFileIcons/blob/main/LICENSE'
             ProjectUri   = 'https://github.com/hanthor/PSFileIcons'
-            ReleaseNotes = 'Initial release.'
+            ReleaseNotes = 'Fix folder icon glyph (use universal nf-fa-folder U+F07B); fix archive icon; add ANSI color coding by file type.'
         }
     }
 }
